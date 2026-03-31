@@ -61,6 +61,44 @@ body{
   will-change:left, top, transform, opacity;
 }
 
+.yum-bubble{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%, -50%) scale(0.8);
+  z-index:10000;
+  opacity:0;
+  pointer-events:none;
+  background:rgba(255,255,255,0.92);
+  color:#2f3b1f;
+  padding:10px 14px;
+  border-radius:18px;
+  font-size:22px;
+  font-weight:700;
+  line-height:1;
+  box-shadow:0 6px 18px rgba(0,0,0,0.18);
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+
+.yum-bubble::after{
+  content:"";
+  position:absolute;
+  left:18px;
+  bottom:-8px;
+  width:14px;
+  height:14px;
+  background:rgba(255,255,255,0.92);
+  transform:rotate(45deg);
+  border-radius:2px;
+}
+
+.yum-bubble.show{
+  opacity:1;
+  transform:translate(-50%, -50%) scale(1);
+}
+
 .weather-fog-layer{
   position:absolute;
   inset:0;
