@@ -155,7 +155,7 @@ function showYumBubble() {
   yumBubble.style.left = `${window.innerWidth * 0.52}px`;
   yumBubble.style.top = isMobile
     ? `${window.innerHeight * 0.56}px`
-    : `${window.innerHeight * 0.62}px`;
+    : `${window.innerHeight * 0.68}px`;
   
   yumBubble.classList.add('show');
 
