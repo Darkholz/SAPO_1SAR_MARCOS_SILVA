@@ -48,7 +48,7 @@ body{
 
 .fly{
   position:absolute;
-  width:18px;
+  width:36px;
   height:auto;
   left:-100px;
   top:30vh;
