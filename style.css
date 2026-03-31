@@ -1,9 +1,3 @@
-:root{
-  --sky-top:#7fc8ff;
-  --sky-bottom:#dff6ff;
-  --cloud:rgba(255,255,255,0.82);
-}
-
 *{
   box-sizing:border-box;
 }
@@ -16,7 +10,7 @@ html, body{
 }
 
 body{
-  background:#cfeeff;
+  background:#d7ebf7;
   font-family:Arial, Helvetica, sans-serif;
 }
 
@@ -25,96 +19,29 @@ body{
   width:100vw;
   height:100vh;
   overflow:hidden;
-  background:linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 100%);
+  background:#d7ebf7;
 }
 
-.sky{
-  position:absolute;
-  inset:0;
-  background:
-    radial-gradient(circle at 72% 18%, rgba(255,243,169,0.65), transparent 16%),
-    radial-gradient(circle at 30% 14%, rgba(255,255,255,0.20), transparent 20%),
-    linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 100%);
-  z-index:1;
-  transition:background 0.5s ease;
-}
-
-.sun-moon{
-  position:absolute;
-  right:7vw;
-  top:7vh;
-  width:clamp(78px, 9vw, 130px);
-  aspect-ratio:1;
-  border-radius:50%;
-  background:radial-gradient(circle at 35% 35%, #fff9d6 0%, #ffe58f 58%, #ffd35c 100%);
-  box-shadow:0 0 55px rgba(255,220,120,0.65);
-  z-index:2;
-  transition:all 0.5s ease;
-}
-
-.clouds{
-  position:absolute;
-  inset:0;
-  z-index:2;
-  pointer-events:none;
-}
-
-.cloud{
-  position:absolute;
-  height:48px;
-  border-radius:999px;
-  background:var(--cloud);
-  opacity:0.9;
-  animation:cloudFloat linear infinite;
-}
-
-.cloud::before,
-.cloud::after{
-  content:"";
-  position:absolute;
-  background:inherit;
-  border-radius:50%;
-}
-
-.cloud-a{
-  width:180px;
-  left:8vw;
-  top:10vh;
-  animation-duration:26s;
-}
-.cloud-a::before{ width:58px; height:58px; left:20px; top:-20px; }
-.cloud-a::after{ width:74px; height:74px; left:86px; top:-28px; }
-
-.cloud-b{
-  width:210px;
-  left:46vw;
-  top:17vh;
-  animation-duration:32s;
-}
-.cloud-b::before{ width:64px; height:64px; left:26px; top:-18px; }
-.cloud-b::after{ width:82px; height:82px; left:102px; top:-32px; }
-
-.cloud-c{
-  width:150px;
-  left:76vw;
-  top:13vh;
-  animation-duration:24s;
-}
-.cloud-c::before{ width:50px; height:50px; left:18px; top:-14px; }
-.cloud-c::after{ width:66px; height:66px; left:68px; top:-24px; }
-
-@keyframes cloudFloat{
-  0%{ transform:translateX(0); }
-  50%{ transform:translateX(24px); }
-  100%{ transform:translateX(0); }
-}
-
-.pond-scene{
+.sky-image{
   position:absolute;
   inset:0;
   width:100%;
   height:100%;
   object-fit:cover;
+  z-index:1;
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+
+.pond-scene{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:min(92vw, 1200px);
+  height:auto;
+  transform:translate(-50%, -50%);
+  object-fit:contain;
   z-index:5;
   pointer-events:none;
   user-select:none;
@@ -127,7 +54,7 @@ body{
   z-index:6;
   opacity:0;
   pointer-events:none;
-  transition:opacity 0.5s ease;
+  transition:opacity 0.45s ease;
 }
 
 .weather-fog-layer span{
@@ -136,18 +63,18 @@ body{
   width:120%;
   height:24%;
   border-radius:50%;
-  background:rgba(255,255,255,0.38);
-  filter:blur(20px);
+  background:rgba(255,255,255,0.34);
+  filter:blur(22px);
   animation:fogMove 12s ease-in-out infinite;
 }
 
-.weather-fog-layer span:nth-child(1){ top:16%; }
+.weather-fog-layer span:nth-child(1){ top:14%; }
 .weather-fog-layer span:nth-child(2){ top:38%; animation-duration:15s; }
-.weather-fog-layer span:nth-child(3){ top:60%; animation-duration:18s; }
+.weather-fog-layer span:nth-child(3){ top:62%; animation-duration:18s; }
 
 @keyframes fogMove{
   0%,100%{ transform:translateX(0); }
-  50%{ transform:translateX(-32px); }
+  50%{ transform:translateX(-36px); }
 }
 
 .weather-rain-layer{
@@ -156,14 +83,14 @@ body{
   z-index:7;
   opacity:0;
   pointer-events:none;
-  transition:opacity 0.4s ease;
+  transition:opacity 0.35s ease;
 }
 
 .drop{
   position:absolute;
   top:-12%;
   width:2px;
-  height:16px;
+  height:18px;
   background:linear-gradient(180deg, rgba(255,255,255,0), rgba(220,240,255,0.95));
   opacity:0.9;
   animation:rainFall linear infinite;
@@ -174,89 +101,26 @@ body{
   to{ transform:translate3d(-8vw,120vh,0) rotate(12deg); }
 }
 
-/* ESTADOS */
-
-.scene.day{
-  --sky-top:#7fc8ff;
-  --sky-bottom:#dff6ff;
-}
-
-.scene.night{
-  --sky-top:#10243d;
-  --sky-bottom:#39577f;
-}
-
-.scene.night .sky{
-  background:
-    radial-gradient(circle at 72% 18%, rgba(255,255,255,0.08), transparent 16%),
-    radial-gradient(circle at 30% 14%, rgba(255,255,255,0.06), transparent 20%),
-    linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 100%);
-}
-
-.scene.night .sun-moon{
-  background:radial-gradient(circle at 35% 35%, #f8f9ff 0%, #dbe4ff 58%, #bcc7e6 100%);
-  box-shadow:0 0 40px rgba(220,230,255,0.25);
-}
-
-.scene.weather-clear .clouds{
-  opacity:0.35;
-}
-
-.scene.weather-partly .clouds{
-  opacity:0.7;
-}
-
-.scene.weather-overcast{
-  --sky-top:#a6b4bf;
-  --sky-bottom:#dde4ea;
-}
-
-.scene.weather-overcast .sun-moon{
-  opacity:0.35;
-}
-
-.scene.weather-overcast .clouds{
+.scene.show-fog .weather-fog-layer{
   opacity:1;
 }
 
-.scene.weather-fog{
-  --sky-top:#bcc8d1;
-  --sky-bottom:#e4eaee;
-}
-
-.scene.weather-fog .sun-moon{
-  opacity:0.22;
-}
-
-.scene.weather-fog .clouds{
-  opacity:0.9;
-}
-
-.scene.weather-fog .weather-fog-layer{
+.scene.show-rain .weather-rain-layer{
   opacity:1;
 }
 
-.scene.weather-rain{
-  --sky-top:#74899a;
-  --sky-bottom:#c2ced8;
+@media (max-width: 900px){
+  .pond-scene{
+    width:98vw;
+  }
 }
 
-.scene.weather-rain .sun-moon{
-  opacity:0.18;
-}
+@media (max-width: 640px){
+  .pond-scene{
+    width:110vw;
+  }
 
-.scene.weather-rain .clouds{
-  opacity:1;
-}
-
-.scene.weather-rain .weather-rain-layer{
-  opacity:1;
-}
-
-@media (max-width: 700px){
-  .sun-moon{
-    width:70px;
-    top:5vh;
-    right:5vw;
+  .weather-fog-layer span{
+    filter:blur(16px);
   }
 }
