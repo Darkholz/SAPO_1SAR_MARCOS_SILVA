@@ -150,8 +150,13 @@ function setTargetInArea(area) {
 function showYumBubble() {
   if (!yumBubble) return;
 
+  const isMobile = window.innerWidth <= 640;
+  
   yumBubble.style.left = `${window.innerWidth * 0.52}px`;
-  yumBubble.style.top = `${window.innerHeight * 0.62}px`;
+  yumBubble.style.top = isMobile
+    ? `${window.innerHeight * 0.56}px`
+    : `${window.innerHeight * 0.62}px`;
+  
   yumBubble.classList.add('show');
 
   setTimeout(() => {
