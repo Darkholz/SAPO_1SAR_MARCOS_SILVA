@@ -18,8 +18,9 @@ let flyTargetY = 0;
 let flyAnglePhase = 0;
 
 let flyWaitingSince = performance.now();
-let flyNextStartDelay = 3000; // primeira aparição rápida
+let flyNextStartDelay = 3000;
 let hoverStartedAt = 0;
+let sideSwitchAt = 0;
 
 function random(min, max) {
   return Math.random() * (max - min) + min;
@@ -122,7 +123,16 @@ function getMouthPoint() {
   };
 }
 
-function getHoverArea() {
+function getLeftHoverArea() {
+  return {
+    minX: window.innerWidth * 0.18,
+    maxX: window.innerWidth * 0.36,
+    minY: window.innerHeight * 0.28,
+    maxY: window.innerHeight * 0.46
+  };
+}
+
+function getRightHoverArea() {
   return {
     minX: window.innerWidth * 0.57,
     maxX: window.innerWidth * 0.72,
@@ -131,23 +141,20 @@ function getHoverArea() {
   };
 }
 
+function setTargetInArea(area) {
+  flyTargetX = random(area.minX, area.maxX);
+  flyTargetY = random(area.minY, area.maxY);
+}
+
 function startFlyLoop(now) {
-  flyState = 'entering';
+  flyState = 'entering-left';
   fly.style.opacity = '1';
   flyX = -30;
   flyY = window.innerHeight * random(0.30, 0.40);
-
-  const area = getHoverArea();
-  flyTargetX = random(area.minX, area.maxX);
-  flyTargetY = random(area.minY, area.maxY);
+  setTargetInArea(getLeftHoverArea());
   hoverStartedAt = 0;
+  sideSwitchAt = 0;
   flyWaitingSince = now;
-}
-
-function setNewHoverTarget() {
-  const area = getHoverArea();
-  flyTargetX = random(area.minX, area.maxX);
-  flyTargetY = random(area.minY, area.maxY);
 }
 
 function resetFlyWaiting(now) {
@@ -158,6 +165,23 @@ function resetFlyWaiting(now) {
   flyWaitingSince = now;
   flyNextStartDelay = getRandomLoopDelay();
   hoverStartedAt = 0;
+  sideSwitchAt = 0;
+}
+
+function moveTowardsTarget(speedXFactor, speedYFactor, extraX = 0) {
+  const dx = flyTargetX - flyX;
+  const dy = flyTargetY - flyY;
+
+  flyX += dx * speedXFactor + extraX;
+  flyY += dy * speedYFactor;
+
+  return { dx, dy };
+}
+
+function applyNaturalWobble() {
+  flyAnglePhase += 0.1;
+  flyX += Math.sin(flyAnglePhase * 1.7) * 0.7;
+  flyY += Math.cos(flyAnglePhase * 2.1) * 0.5;
 }
 
 function animateFly(now) {
@@ -169,33 +193,48 @@ function animateFly(now) {
     }
   }
 
-  if (flyState === 'entering') {
-    const dx = flyTargetX - flyX;
-    const dy = flyTargetY - flyY;
-
-    flyX += dx * 0.03 + 0.8;
-    flyY += dy * 0.05;
+  if (flyState === 'entering-left') {
+    const { dx, dy } = moveTowardsTarget(0.03, 0.05, 0.8);
 
     if (Math.abs(dx) < 12 && Math.abs(dy) < 12) {
-      flyState = 'hovering';
+      flyState = 'hovering-left';
       hoverStartedAt = now;
-      setNewHoverTarget();
+      setTargetInArea(getLeftHoverArea());
     }
   }
 
-  if (flyState === 'hovering') {
-    const dx = flyTargetX - flyX;
-    const dy = flyTargetY - flyY;
-
-    flyX += dx * 0.025;
-    flyY += dy * 0.025;
-
-    flyAnglePhase += 0.1;
-    flyX += Math.sin(flyAnglePhase * 1.7) * 0.7;
-    flyY += Math.cos(flyAnglePhase * 2.1) * 0.5;
+  if (flyState === 'hovering-left') {
+    const { dx, dy } = moveTowardsTarget(0.025, 0.025);
+    applyNaturalWobble();
 
     if (Math.abs(dx) < 8 && Math.abs(dy) < 8) {
-      setNewHoverTarget();
+      setTargetInArea(getLeftHoverArea());
+    }
+
+    if (hoverStartedAt && now - hoverStartedAt > random(2500, 4500)) {
+      flyState = 'crossing-right';
+      sideSwitchAt = now;
+      setTargetInArea(getRightHoverArea());
+    }
+  }
+
+  if (flyState === 'crossing-right') {
+    const { dx, dy } = moveTowardsTarget(0.022, 0.03, 0.9);
+    applyNaturalWobble();
+
+    if (Math.abs(dx) < 14 && Math.abs(dy) < 14) {
+      flyState = 'hovering-right';
+      hoverStartedAt = now;
+      setTargetInArea(getRightHoverArea());
+    }
+  }
+
+  if (flyState === 'hovering-right') {
+    const { dx, dy } = moveTowardsTarget(0.025, 0.025);
+    applyNaturalWobble();
+
+    if (Math.abs(dx) < 8 && Math.abs(dy) < 8) {
+      setTargetInArea(getRightHoverArea());
     }
 
     if (hoverStartedAt && now - hoverStartedAt > random(5000, 9000)) {
@@ -207,10 +246,10 @@ function animateFly(now) {
     const mouth = getMouthPoint();
     const dx = mouth.x - flyX;
     const dy = mouth.y - flyY;
-  
+
     flyX += dx * 0.14;
     flyY += dy * 0.14;
-  
+
     if (Math.abs(dx) < 2 && Math.abs(dy) < 2) {
       resetFlyWaiting(now);
     }
