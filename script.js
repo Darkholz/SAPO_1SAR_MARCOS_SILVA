@@ -72,7 +72,7 @@ function shouldShowRain(code) {
 
 function getSkyImageName(isDay, cloudGroup) {
   const prefix = isDay ? 'day' : 'night';
-  return `${prefix}_${cloudGroup}.png?v=11`;
+  return `${prefix}_${cloudGroup}.png`;
 }
 
 function applyVisualState(weatherCode, isDay) {
@@ -109,7 +109,7 @@ async function applyLiveWeather() {
     applyVisualState(weatherCode, isDay);
   } catch (error) {
     if (!currentSkySrc) {
-      currentSkySrc = 'day_few.png?v=11';
+      currentSkySrc = 'day_few.png';
       skyImage.src = currentSkySrc;
     }
 
