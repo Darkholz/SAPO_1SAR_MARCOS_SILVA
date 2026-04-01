@@ -29,6 +29,33 @@ let preCatchStartedAt = 0;
 let assetsReady = false;
 let tongueAnimating = false;
 
+const TONGUE_SOURCES = ['tongue_1.png', 'tongue_2.png', 'tongue_3.png'];
+const tongueImageCache = new Map();
+
+async function preloadTongueFrames() {
+  await Promise.all(
+    TONGUE_SOURCES.map((src) => {
+      return new Promise((resolve) => {
+        const img = new Image();
+
+        img.onload = async () => {
+          try {
+            if (typeof img.decode === 'function') {
+              await img.decode();
+            }
+          } catch (_) {}
+
+          tongueImageCache.set(src, img);
+          resolve();
+        };
+
+        img.onerror = () => resolve();
+        img.src = src;
+      });
+    })
+  );
+}
+
 function random(min, max) {
   return Math.random() * (max - min) + min;
 }
@@ -191,47 +218,31 @@ async function setTongueFrame(src) {
   if (!tongueFrame) return;
 
   const base = getTongueBasePoint();
+  const cachedImg = tongueImageCache.get(src);
 
-  await new Promise((resolve) => {
-    const finalize = () => {
-      requestAnimationFrame(() => {
-        const width = tongueFrame.naturalWidth || tongueFrame.width || 120;
-        const height = tongueFrame.naturalHeight || tongueFrame.height || 40;
-
-        const frameOffset = getTongueFrameOffsets(src);
-
-        tongueFrame.style.left = `${base.x - width + frameOffset.x}px`;
-        tongueFrame.style.top = `${base.y - height * 0.72 + frameOffset.y}px`;
-        tongueFrame.style.opacity = '1';
-
-        resolve();
-      });
-    };
-
-    const currentSrc = tongueFrame.getAttribute('src');
-
-    tongueFrame.onload = null;
-    tongueFrame.onerror = null;
-
-    if (currentSrc === src && tongueFrame.complete && tongueFrame.naturalWidth > 0) {
-      finalize();
-      return;
-    }
-
-    tongueFrame.onload = () => {
-      tongueFrame.onload = null;
-      tongueFrame.onerror = null;
-      finalize();
-    };
-
-    tongueFrame.onerror = () => {
-      tongueFrame.onload = null;
-      tongueFrame.onerror = null;
-      resolve();
-    };
-
+  if (tongueFrame.getAttribute('src') !== src) {
     tongueFrame.src = src;
-  });
+  }
+
+  await new Promise(resolve => requestAnimationFrame(resolve));
+
+  const width =
+    (cachedImg && cachedImg.naturalWidth) ||
+    tongueFrame.naturalWidth ||
+    tongueFrame.width ||
+    120;
+
+  const height =
+    (cachedImg && cachedImg.naturalHeight) ||
+    tongueFrame.naturalHeight ||
+    tongueFrame.height ||
+    40;
+
+  const frameOffset = getTongueFrameOffsets(src);
+
+  tongueFrame.style.left = `${base.x - width + frameOffset.x}px`;
+  tongueFrame.style.top = `${base.y - height * 0.72 + frameOffset.y}px`;
+  tongueFrame.style.opacity = '1';
 }
 
 async function playTongueCatch() {
@@ -304,7 +315,7 @@ function getTongueBasePoint() {
 
   if (profile === 'desktop-large-short') {
     return {
-      x: rect.left + rect.width * 0.62,
+      x: rect.left + rect.width * 0.63,
       y: rect.top + rect.height * 0.72
     };
   }
