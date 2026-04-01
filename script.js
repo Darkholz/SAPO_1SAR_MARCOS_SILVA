@@ -578,15 +578,40 @@ function waitForImage(img) {
   });
 }
 
-function debugScreenInfo() {
-  const rect = getPondRect();
+function showDebugOverlay() {
+  const existing = document.getElementById('debugOverlay');
+  if (existing) existing.remove();
 
-  console.log('window.innerWidth:', window.innerWidth);
-  console.log('window.innerHeight:', window.innerHeight);
-  console.log('devicePixelRatio:', window.devicePixelRatio);
-  console.log('screen profile:', getScreenProfile());
-  console.log('pond width:', rect.width);
-  console.log('pond height:', rect.height);
+  const rect = getPondRect();
+  const overlay = document.createElement('div');
+  overlay.id = 'debugOverlay';
+
+  overlay.style.position = 'fixed';
+  overlay.style.left = '12px';
+  overlay.style.top = '12px';
+  overlay.style.zIndex = '999999';
+  overlay.style.background = 'rgba(0, 0, 0, 0.75)';
+  overlay.style.color = '#fff';
+  overlay.style.padding = '10px 12px';
+  overlay.style.borderRadius = '10px';
+  overlay.style.fontSize = '14px';
+  overlay.style.lineHeight = '1.4';
+  overlay.style.fontFamily = 'Arial, Helvetica, sans-serif';
+  overlay.style.pointerEvents = 'none';
+  overlay.style.whiteSpace = 'pre-line';
+
+  overlay.textContent = [
+    `window.innerWidth: ${window.innerWidth}`,
+    `window.innerHeight: ${window.innerHeight}`,
+    `devicePixelRatio: ${window.devicePixelRatio}`,
+    `screen.width: ${window.screen.width}`,
+    `screen.height: ${window.screen.height}`,
+    `screen profile: ${getScreenProfile()}`,
+    `pond width: ${Math.round(rect.width)}`,
+    `pond height: ${Math.round(rect.height)}`
+  ].join('\n');
+
+  document.body.appendChild(overlay);
 }
 
 async function initScene() {
@@ -603,13 +628,15 @@ async function initScene() {
   await waitForImage(skyImage);
   skyImage.classList.add('loaded');
 
-  debugScreenInfo();
+  showDebugOverlay();
 }
 
 window.addEventListener('resize', () => {
   if (flyState === 'waiting') {
     flyY = window.innerHeight * 0.32;
   }
+
+  showDebugOverlay();
 });
 
 setInterval(applyLiveWeather, REFRESH_INTERVAL);
