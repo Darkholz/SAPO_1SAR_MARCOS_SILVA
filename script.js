@@ -150,20 +150,42 @@ function hideYumBubble() {
 }
 
 function getLeftHoverArea() {
+  const isMobile = window.innerWidth <= 640;
+
+  if (isMobile) {
+    return {
+      minX: window.innerWidth * 0.16,
+      maxX: window.innerWidth * 0.34,
+      minY: window.innerHeight * 0.42,
+      maxY: window.innerHeight * 0.58
+    };
+  }
+
   return {
     minX: window.innerWidth * 0.18,
     maxX: window.innerWidth * 0.36,
-    minY: window.innerHeight * 0.28,
-    maxY: window.innerHeight * 0.46
+    minY: window.innerHeight * 0.38,
+    maxY: window.innerHeight * 0.54
   };
 }
 
 function getRightHoverArea() {
+  const isMobile = window.innerWidth <= 640;
+
+  if (isMobile) {
+    return {
+      minX: window.innerWidth * 0.56,
+      maxX: window.innerWidth * 0.74,
+      minY: window.innerHeight * 0.46,
+      maxY: window.innerHeight * 0.62
+    };
+  }
+
   return {
     minX: window.innerWidth * 0.57,
     maxX: window.innerWidth * 0.72,
-    minY: window.innerHeight * 0.34,
-    maxY: window.innerHeight * 0.50
+    minY: window.innerHeight * 0.42,
+    maxY: window.innerHeight * 0.58
   };
 }
 
@@ -173,10 +195,15 @@ function setTargetInArea(area) {
 }
 
 function startFlyLoop(now) {
+  const isMobile = window.innerWidth <= 640;
+
   flyState = 'entering-left';
   fly.style.opacity = '1';
   flyX = -30;
-  flyY = window.innerHeight * random(0.30, 0.40);
+  flyY = isMobile
+    ? window.innerHeight * random(0.44, 0.54)
+    : window.innerHeight * random(0.40, 0.50);
+
   setTargetInArea(getLeftHoverArea());
   hoverStartedAt = 0;
   sideSwitchAt = 0;
