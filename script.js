@@ -223,7 +223,7 @@ async function playTongueCatch() {
 
   if (isMobile) {
     setTongueFrame('tongue_3.png');
-    await wait(30);
+    await wait(50);
   } else {
     setTongueFrame('tongue_3.png');
     await wait(25);
@@ -578,6 +578,17 @@ function waitForImage(img) {
   });
 }
 
+function debugScreenInfo() {
+  const rect = getPondRect();
+
+  console.log('window.innerWidth:', window.innerWidth);
+  console.log('window.innerHeight:', window.innerHeight);
+  console.log('devicePixelRatio:', window.devicePixelRatio);
+  console.log('screen profile:', getScreenProfile());
+  console.log('pond width:', rect.width);
+  console.log('pond height:', rect.height);
+}
+
 async function initScene() {
   await applyLiveWeather();
 
@@ -591,6 +602,8 @@ async function initScene() {
 
   await waitForImage(skyImage);
   skyImage.classList.add('loaded');
+
+  debugScreenInfo();
 }
 
 window.addEventListener('resize', () => {
