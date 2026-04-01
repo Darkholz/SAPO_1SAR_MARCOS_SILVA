@@ -24,6 +24,7 @@ let flyWaitingSince = performance.now();
 let flyNextStartDelay = 3000;
 let hoverStartedAt = 0;
 let sideSwitchAt = 0;
+let preCatchStartedAt = 0;
 
 let assetsReady = false;
 let tongueAnimating = false;
@@ -141,8 +142,8 @@ function getTongueBasePoint() {
   }
 
   return {
-    x: window.innerWidth * 0.535,
-    y: window.innerHeight * 0.61
+    x: window.innerWidth * 0.8,
+    y: window.innerHeight * 1
   };
 }
 
