@@ -21,7 +21,7 @@ let flyTargetY = 0;
 let flyAnglePhase = 0;
 
 let flyWaitingSince = performance.now();
-let flyNextStartDelay = 3000;
+let flyNextStartDelay = 300;
 let hoverStartedAt = 0;
 let sideSwitchAt = 0;
 let preCatchStartedAt = 0;
@@ -124,29 +124,6 @@ async function applyLiveWeather() {
 }
 
 
-function getMouthPoint() {
-  return {
-    x: window.innerWidth * 0.505,
-    y: window.innerHeight * 0.67
-  };
-}
-
-function getTongueBasePoint() {
-  const isMobile = window.innerWidth <= 640;
-
-  if (isMobile) {
-    return {
-      x: window.innerWidth * 0.56,
-      y: window.innerHeight * 0.675
-    };
-  }
-
-  return {
-    x: window.innerWidth * 0.8,
-    y: window.innerHeight * 1
-  };
-}
-
 function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -190,19 +167,44 @@ async function playTongueCatch() {
   tongueAnimating = false;
 }
 
-function getPreCatchPoint() {
-  const isMobile = window.innerWidth <= 640;
+function getPondRect() {
+  return pondScene.getBoundingClientRect();
+}
 
-  if (isMobile) {
-    return {
-      x: window.innerWidth * 0.60,
-      y: window.innerHeight * 0.63
-    };
-  }
+function getMouthPoint() {
+  const rect = getPondRect();
 
   return {
-    x: window.innerWidth * 0.57,
-    y: window.innerHeight * 0.60
+    x: rect.left + rect.width * 0.505,
+    y: rect.top + rect.height * 0.67
+  };
+}
+
+function getTongueBasePoint() {
+  const rect = getPondRect();
+
+  return {
+    x: rect.left + rect.width * 0.65,
+    y: rect.top + rect.height * 0.73
+  };
+}
+
+function getTongueTipPoint() {
+  const rect = getPondRect();
+
+  return {
+    x: rect.left + rect.width * 0.65,
+    y: rect.top + rect.height * 0.62
+  };
+}
+
+
+function getPreCatchPoint() {
+  const rect = getPondRect();
+
+  return {
+    x: rect.left + rect.width * 0.57,
+    y: rect.top + rect.height * 0.60
   };
 }
 
@@ -229,42 +231,24 @@ function hideYumBubble() {
 }
 
 function getLeftHoverArea() {
-  const isMobile = window.innerWidth <= 640;
-
-  if (isMobile) {
-    return {
-      minX: window.innerWidth * 0.16,
-      maxX: window.innerWidth * 0.34,
-      minY: window.innerHeight * 0.42,
-      maxY: window.innerHeight * 0.58
-    };
-  }
+  const rect = getPondRect();
 
   return {
-    minX: window.innerWidth * 0.18,
-    maxX: window.innerWidth * 0.36,
-    minY: window.innerHeight * 0.38,
-    maxY: window.innerHeight * 0.54
+    minX: rect.left + rect.width * 0.16,
+    maxX: rect.left + rect.width * 0.34,
+    minY: rect.top + rect.height * 0.42,
+    maxY: rect.top + rect.height * 0.58
   };
 }
 
 function getRightHoverArea() {
-  const isMobile = window.innerWidth <= 640;
-
-  if (isMobile) {
-    return {
-      minX: window.innerWidth * 0.56,
-      maxX: window.innerWidth * 0.74,
-      minY: window.innerHeight * 0.46,
-      maxY: window.innerHeight * 0.62
-    };
-  }
+  const rect = getPondRect();
 
   return {
-    minX: window.innerWidth * 0.57,
-    maxX: window.innerWidth * 0.72,
-    minY: window.innerHeight * 0.42,
-    maxY: window.innerHeight * 0.58
+    minX: rect.left + rect.width * 0.56,
+    maxX: rect.left + rect.width * 0.74,
+    minY: rect.top + rect.height * 0.46,
+    maxY: rect.top + rect.height * 0.62
   };
 }
 
@@ -330,7 +314,7 @@ function animateFly(now) {
   }
 
   if (flyState === 'entering-left') {
-    const { dx, dy } = moveTowardsTarget(0.03, 0.05, 0.8);
+    const { dx, dy } = moveTowardsTarget(0.06, 0.08, 1.8);
 
     if (Math.abs(dx) < 12 && Math.abs(dy) < 12) {
       flyState = 'hovering-left';
@@ -402,20 +386,28 @@ function animateFly(now) {
   }
   
   if (flyState === 'caught') {
-    const mouth = getMouthPoint();
-    const dx = mouth.x - flyX;
-    const dy = mouth.y - flyY;
-  
-    flyX += dx * 0.18;
-    flyY += dy * 0.18;
-  
-    if (Math.abs(dx) < 14 && Math.abs(dy) < 14) {
+    const tongueTip = getTongueTipPoint();
+    const flyHalfW = fly.offsetWidth * 0.5;
+    const flyHalfH = fly.offsetHeight * 0.5;
+
+    const targetX = tongueTip.x - flyHalfW;
+    const targetY = tongueTip.y - flyHalfH;
+
+    const dx = targetX - flyX;
+    const dy = targetY - flyY;
+
+    flyX += dx * 0.22;
+    flyY += dy * 0.22;
+
+    if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
       flyState = 'digesting';
-  
+
       playTongueCatch().then(() => {
+        fly.style.left = `${targetX}px`;
+        fly.style.top = `${targetY}px`;
         fly.style.opacity = '0';
         showYumBubble();
-  
+
         setTimeout(() => {
           resetFlyWaiting(performance.now());
         }, 1200);
@@ -470,13 +462,13 @@ async function initScene() {
   await waitForImage(pondScene);
   pondScene.classList.add('loaded');
 
+  assetsReady = true;
+  flyWaitingSince = performance.now();
+
   await new Promise(resolve => setTimeout(resolve, 120));
 
   await waitForImage(skyImage);
   skyImage.classList.add('loaded');
-
-  assetsReady = true;
-  flyWaitingSince = performance.now();
 }
 
 window.addEventListener('resize', () => {
