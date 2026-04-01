@@ -73,6 +73,18 @@ body{
   will-change:left, top, transform, opacity;
 }
 
+.tongue-frame{
+  position:absolute;
+  left:0;
+  top:0;
+  z-index:10001;
+  opacity:0;
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-drag:none;
+  will-change:left, top, opacity, transform;
+}
+
 .yum-bubble{
   position:absolute;
   left:50%;
