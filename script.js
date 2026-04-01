@@ -153,15 +153,24 @@ async function playTongueCatch() {
   if (!tongueFrame || tongueAnimating) return;
 
   tongueAnimating = true;
+  const isMobile = window.innerWidth <= 640;
 
-  setTongueFrame('tongue_3.png?v=tongue1');
-  await wait(45);
+  if (isMobile) {
+    setTongueFrame('tongue_2.png?v=tongue1');
+    await wait(45);
 
-  setTongueFrame('tongue_2.png?v=tongue1');
-  await wait(45);
+    setTongueFrame('tongue_1.png?v=tongue1');
+    await wait(70);
+  } else {
+    setTongueFrame('tongue_3.png?v=tongue1');
+    await wait(45);
 
-  setTongueFrame('tongue_1.png?v=tongue1');
-  await wait(70);
+    setTongueFrame('tongue_2.png?v=tongue1');
+    await wait(45);
+
+    setTongueFrame('tongue_1.png?v=tongue1');
+    await wait(70);
+  }
 
   hideTongueFrame();
   tongueAnimating = false;
@@ -182,6 +191,14 @@ function getMouthPoint() {
 
 function getTongueBasePoint() {
   const rect = getPondRect();
+  const isMobile = window.innerWidth <= 640;
+
+  if (isMobile) {
+    return {
+      x: rect.left + rect.width * 0.60,
+      y: rect.top + rect.height * 0.69
+    };
+  }
 
   return {
     x: rect.left + rect.width * 0.65,
@@ -191,6 +208,14 @@ function getTongueBasePoint() {
 
 function getTongueTipPoint() {
   const rect = getPondRect();
+  const isMobile = window.innerWidth <= 640;
+
+  if (isMobile) {
+    return {
+      x: rect.left + rect.width * 0.56,
+      y: rect.top + rect.height * 0.64
+    };
+  }
 
   return {
     x: rect.left + rect.width * 0.65,
